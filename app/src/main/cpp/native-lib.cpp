@@ -3,6 +3,6 @@
 
 extern "C"
 
-JNIEXPORT jstring JNICALL Java_com_bruno_desafiomuxi_MainActivity_stringFromJNI(JNIEnv *env, jobject) {
+JNIEXPORT jstring JNICALL Java_com_bruno_desafiomuxi_core_MainActivity_stringFromJNI(JNIEnv *env, jobject) {
     return env->NewStringUTF(std::string("Hello from C++").c_str());
 }
