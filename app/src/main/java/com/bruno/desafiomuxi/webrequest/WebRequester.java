@@ -139,7 +139,10 @@ public class WebRequester {
 
         @Override
         public void onErrorResponse(VolleyError error) {
-            webRequestListener.requestError(error.getMessage(), requestId);
+            if(error.getMessage() != null)
+                webRequestListener.requestError(error.getMessage(), requestId);
+            else
+                webRequestListener.requestError("", requestId);
         }
     }
 }
