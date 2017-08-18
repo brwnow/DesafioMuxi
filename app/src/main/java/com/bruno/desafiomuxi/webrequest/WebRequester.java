@@ -3,6 +3,7 @@ package com.bruno.desafiomuxi.webrequest;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -12,6 +13,9 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.LruCache;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
@@ -24,14 +28,26 @@ public class WebRequester {
     // instances of the WebRequester class
     private static RequestQueue requestQueue = null;
 
+    // Application context for further use by Picasso lib
+    private static Context appContext;
+
+    private static Picasso picasso;
+
     private static String fruitsJsonUrl = "";
 
     // This method initializes the request queue, given a context
     // and sets the URL of the fruits json
     public static void init(Context context, String fruitsJsonUrl) {
         // Only initialize the request queue if no request queue were initialized before
-        if(requestQueue == null)
+        if(requestQueue == null || appContext == null) {
             requestQueue = Volley.newRequestQueue(context);
+
+            appContext = context;
+
+            picasso = new Picasso.Builder(appContext).memoryCache(new LruCache(appContext)).build();
+
+            Log.v("WebRequest", "Request queue initialized");
+        }
 
         WebRequester.fruitsJsonUrl = fruitsJsonUrl;
     }
@@ -46,10 +62,11 @@ public class WebRequester {
     // This method perform a get request for the json that contains the fruits informations
     public boolean fruitsGetRequest(WebRequestListener webRequestListener, int requestId) {
         if(canStartRequests()) {
-            requestQueue.add(new StringRequest( Request.Method.GET,
-                                                fruitsJsonUrl,
-                                                new FruitsRequestHandler(webRequestListener, requestId),
-                                                new ErrorResponseHandler(webRequestListener, requestId) ) );
+            // The request callback handler, set up with the request listener and the request ID
+            FruitsRequestHandler fruitsRequestHandler = new FruitsRequestHandler(webRequestListener, requestId);
+
+            // Push the request into the request queue
+            requestQueue.add(new StringRequest(Request.Method.GET, fruitsJsonUrl, fruitsRequestHandler, fruitsRequestHandler));
 
             return true; // Request performed succesfully
         } else {
@@ -57,27 +74,10 @@ public class WebRequester {
         }
     }
 
-    // This method perform a get request for the image of the given fruit
-    public boolean fruitImageGetRequest(final Fruit fruit, WebRequestListener webRequestListener, int requestId) {
+    // This method perform a get request for a image, given the image URI
+    public boolean imageGetRequest(final String imageUrl, WebRequestListener webRequestListener, int requestId, ImageView intoView) {
         if(canStartRequests()) {
-            requestQueue.add(new ImageRequest(  fruit.getImageUrl(),
-                                                new FruitImageRequestHandler(webRequestListener, requestId),
-                                                0, 0, null,
-                                                new ErrorResponseHandler(webRequestListener, requestId) ) );
-
-            return true; // Request performed succesfully
-        } else {
-            return false; // A get request can't be started
-        }
-    }
-
-    // This method perform a get request for the image, given the image URL
-    public boolean imageGetRequest(final String imageUrl, WebRequestListener webRequestListener, int requestId) {
-        if(canStartRequests()) {
-            requestQueue.add(new ImageRequest(  imageUrl,
-                                                new ImageRequestHandler(webRequestListener, requestId),
-                                                0, 0, null,
-                                                new ErrorResponseHandler(webRequestListener, requestId) ) );
+            Picasso.with(appContext).load(imageUrl).into(intoView, new ImageRequestHandler(webRequestListener, requestId));
 
             return true; // Request performed succesfully
         } else {
@@ -95,7 +95,7 @@ public class WebRequester {
         }
     }
 
-    private class FruitsRequestHandler extends BaseRequestHandler implements Response.Listener<String> {
+    private class FruitsRequestHandler extends BaseRequestHandler implements Response.Listener<String>, Response.ErrorListener {
         public FruitsRequestHandler(final WebRequestListener webRequestListener, int requestId) {
             super(webRequestListener, requestId);
         }
@@ -108,34 +108,6 @@ public class WebRequester {
 
             webRequestListener.fruitsReceived(fruitsDeserialized.getFruitsArray(), requestId);
         }
-    }
-
-    private class FruitImageRequestHandler extends BaseRequestHandler implements Response.Listener<Bitmap> {
-        public FruitImageRequestHandler(final WebRequestListener webRequestListener, int requestId) {
-            super(webRequestListener, requestId);
-        }
-
-        @Override
-        public void onResponse(Bitmap response) {
-            webRequestListener.fruitImageReceived(response, requestId);
-        }
-    }
-
-    private class ImageRequestHandler extends BaseRequestHandler implements Response.Listener<Bitmap> {
-        public ImageRequestHandler(final WebRequestListener webRequestListener, int requestId) {
-            super(webRequestListener, requestId);
-        }
-
-        @Override
-        public void onResponse(Bitmap response) {
-            webRequestListener.imageReceived(response, requestId);
-        }
-    }
-
-    private class ErrorResponseHandler extends BaseRequestHandler implements Response.ErrorListener {
-        public ErrorResponseHandler(final WebRequestListener webRequestListener, int requestId) {
-            super(webRequestListener, requestId);
-        }
 
         @Override
         public void onErrorResponse(VolleyError error) {
@@ -143,6 +115,22 @@ public class WebRequester {
                 webRequestListener.requestError(error.getMessage(), requestId);
             else
                 webRequestListener.requestError("", requestId);
+        }
+    }
+
+    private class ImageRequestHandler extends BaseRequestHandler implements Callback {
+        public ImageRequestHandler(final WebRequestListener webRequesteListener, int requestId) {
+            super(webRequesteListener, requestId);
+        }
+
+        @Override
+        public void onSuccess() {
+            webRequestListener.imageReceived(requestId);
+        }
+
+        @Override
+        public void onError() {
+            webRequestListener.requestError("Couldn't load the image", requestId);
         }
     }
 }

@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 
 public interface WebRequestListener {
     public void fruitsReceived(Fruit[] fruits, int requestId);
-    public void fruitImageReceived(Bitmap fruitImage, int requestId);
-    public void imageReceived(Bitmap image, int requestId);
+    public void imageReceived(int requestId);
     public void requestError(String errorMessage, int requestId);
 }

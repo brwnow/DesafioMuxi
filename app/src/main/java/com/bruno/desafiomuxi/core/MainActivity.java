@@ -2,10 +2,14 @@ package com.bruno.desafiomuxi.core;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -24,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements WebRequestListener {
+public class MainActivity extends AppCompatActivity implements WebRequestListener, AdapterView.OnItemClickListener {
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements WebRequestListene
 
         fruitsListView = (ListView)findViewById(R.id.fruitsListView);
 
+        fruitsListView.setOnItemClickListener(this);
+
         // Create a WebRequester and request the list of fruits
         // Pass this activity as the listener of the request
         // and the ID is always zero because there is no other
@@ -59,6 +65,20 @@ public class MainActivity extends AppCompatActivity implements WebRequestListene
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent fruitDetailsIntent = new Intent(this, FruitDetailsActivity.class);
+
+        // Let's pass extra information for the fruit name, image url and price
+        // Since we have the position of the clicked item it must match the
+        // position of this item in the fruits array
+        fruitDetailsIntent.putExtra("FRUIT_NAME", fruitsArray[position].getName());
+        fruitDetailsIntent.putExtra("IMAGE_URL", fruitsArray[position].getImageUrl());
+        fruitDetailsIntent.putExtra("FRUIT_PRICE", fruitsArray[position].getPrice());
+
+        startActivity(fruitDetailsIntent);
+    }
 
     @Override
     public void fruitsReceived(Fruit[] fruits, int requestId) {
@@ -91,12 +111,7 @@ public class MainActivity extends AppCompatActivity implements WebRequestListene
     }
 
     @Override
-    public void fruitImageReceived(Bitmap fruitImage, int requestId) {
-        // Not used
-    }
-
-    @Override
-    public void imageReceived(Bitmap image, int requestId) {
+    public void imageReceived(int requestId) {
         // Not used
     }
 
@@ -104,6 +119,9 @@ public class MainActivity extends AppCompatActivity implements WebRequestListene
     public void requestError(String errorMessage, int requestId) {
         Log.e("REQUEST", errorMessage);
 
-        Toast.makeText(MainActivity.this, "Fruits couldn't be loaded", Toast.LENGTH_LONG);
+        Toast errorToast = Toast.makeText(this, "Fruits couldn't be loaded", Toast.LENGTH_LONG);
+        errorToast.setGravity(Gravity.CENTER, 0, 0);
+
+        errorToast.show();
     }
 }
