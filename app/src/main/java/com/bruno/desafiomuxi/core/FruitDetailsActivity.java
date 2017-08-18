@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bruno.desafiomuxi.R;
+import com.bruno.desafiomuxi.currency.Currency;
 import com.bruno.desafiomuxi.webrequest.Fruit;
 import com.bruno.desafiomuxi.webrequest.WebRequestListener;
 import com.bruno.desafiomuxi.webrequest.WebRequester;
@@ -17,7 +18,7 @@ import java.util.Locale;
 public class FruitDetailsActivity extends AppCompatActivity implements WebRequestListener {
     // Loading the native lib for currency conversion
     static {
-
+        System.loadLibrary("currency-converter");
     }
 
     private ImageView fruitImageView;
@@ -41,12 +42,26 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
         // Filling up view components with the extra information
         // passed from the main activity
         fruitNameTextView.setText(getIntent().getStringExtra("FRUIT_NAME"));
-        usdPriceTextView.setText(NumberFormat.getCurrencyInstance(Locale.US).format(getIntent().getDoubleExtra("FRUIT_PRICE", 0.0)));
+
+        // Currency util class. Will be used to get the conversion ratio and formating currency
+        Currency currency = new Currency();
+
+        // Fill up dollar price text view with the formated price to the US Locale
+        usdPriceTextView.setText(currency.format(getIntent().getDoubleExtra("FRUIT_PRICE", 0.0), Currency.CurrencyTag.USD));
+
+        // Get the conversion ratio from USD to BRL
+        double usdToBrlConversionRatio = currency.getConversionRatio(Currency.CurrencyTag.USD, Currency.CurrencyTag.BRL);
+        double brlPrice = convertCurrency(getIntent().getDoubleExtra("FRUIT_PRICE", 0.0), usdToBrlConversionRatio);
+
+        // Fill up real price text view with the converted and formatted price using
+        brlPriceTextView.setText(currency.format(brlPrice, Currency.CurrencyTag.BRL));
 
         // Fill up image view
         String imageUrl = getIntent().getStringExtra("IMAGE_URL");
         (new WebRequester()).imageGetRequest(imageUrl, this, 0, fruitImageView);
     }
+
+    public native double convertCurrency(double baseValue, double conversionRatio);
 
     @Override
     public void fruitsReceived(Fruit[] fruits, int requestId) {

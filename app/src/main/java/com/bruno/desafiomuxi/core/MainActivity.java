@@ -29,11 +29,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements WebRequestListener, AdapterView.OnItemClickListener {
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("native-lib");
-    }
-
     private ListView fruitsListView;
 
     // Stores the information of the fruit list got
