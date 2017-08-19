@@ -30,5 +30,4 @@ private:
     jobject globalObjRef; // Global ref of the instance of FruitDetailsActivity
 };
 
-
 #endif DESAFIOMUXI_ASYNCCURRENCYCONVERTER_H

@@ -2,6 +2,7 @@ package com.bruno.desafiomuxi.webrequest;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -17,6 +18,7 @@ import com.google.gson.Gson;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONObject;
 
@@ -80,7 +82,9 @@ public class WebRequester {
     // This method perform a get request for a image, given the image URI
     public boolean imageGetRequest(final String imageUrl, WebRequestListener webRequestListener, int requestId, ImageView intoView) {
         if(canStartRequests()) {
-            Picasso.with(appContext).load(imageUrl).into(intoView, new ImageRequestHandler(webRequestListener, requestId));
+            // Calls picasso with the application context to start the image request with
+            // ImageRequestListener as the target
+            Picasso.with(appContext).load(imageUrl).into(new ImageRequestHandler(webRequestListener, requestId));
 
             return true; // Request performed succesfully
         } else {
@@ -105,35 +109,52 @@ public class WebRequester {
 
         @Override
         public void onResponse(String response) {
-            Gson gson = new Gson();
+            Log.v("JSON_REQUEST", "JSON succesfully loaded (id: " + requestId + ")");
 
+            Gson gson = new Gson();
             FruitsDeserialized fruitsDeserialized = gson.fromJson(response, FruitsDeserialized.class);
 
+            // Notify that fruits were received as json
             webRequestListener.fruitsReceived(fruitsDeserialized.getFruitsArray(), requestId);
         }
 
         @Override
         public void onErrorResponse(VolleyError error) {
             if(error.getMessage() != null)
+                // Notify a request error has ocurred and send the error message
                 webRequestListener.requestError(error.getMessage(), requestId);
             else
+                Log.e("JSON_REQUEST", error.getMessage() + " (id: " + requestId + ")");
+
+                // // Notify a request error has ocurred, but there is no error message
                 webRequestListener.requestError("", requestId);
         }
     }
 
-    private class ImageRequestHandler extends BaseRequestHandler implements Callback {
+    private class ImageRequestHandler extends BaseRequestHandler implements Target {
         public ImageRequestHandler(final WebRequestListener webRequesteListener, int requestId) {
             super(webRequesteListener, requestId);
         }
 
         @Override
-        public void onSuccess() {
-            webRequestListener.imageReceived(requestId);
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            Log.v("IMAGE_REQUEST", "Image received from " + from.toString() + " (id: " + requestId + ")");
+
+            // Notify that image was received as bitmap
+            webRequestListener.imageReceived(bitmap, requestId);
         }
 
         @Override
-        public void onError() {
+        public void onBitmapFailed(Drawable errorDrawable) {
+            Log.e("IMAGE_REQUEST", "Image request failed (id: " + requestId + ")");
+
+            // Notify that the image request has failed
             webRequestListener.requestError("Couldn't load the image", requestId);
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+            Log.v("IMAGE_REQUEST", "Image request prepared (id: " + requestId + ")");
         }
     }
 }

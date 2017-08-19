@@ -55,12 +55,6 @@ public class MainActivity extends AppCompatActivity implements WebRequestListene
         (new WebRequester()).fruitsGetRequest(this, 0);
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent fruitDetailsIntent = new Intent(this, FruitDetailsActivity.class);
@@ -85,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements WebRequestListene
 
         // Builds the data to be shown in the list of fruits
         // out of the result of the get request
-        for(Fruit fruit : fruits) {
+        for (Fruit fruit : fruits) {
             Map<String, String> datum = new HashMap<String, String>(3);
 
             String formattedPrice = NumberFormat.getCurrencyInstance(Locale.US).format(fruit.getPrice());
@@ -96,17 +90,17 @@ public class MainActivity extends AppCompatActivity implements WebRequestListene
             data.add(datum);
         }
 
-        SimpleAdapter adapter = new SimpleAdapter(  this,
-                                                    data,
-                                                    android.R.layout.simple_list_item_2,
-                                                    new String[] {"name", "price"},
-                                                    new int[] {android.R.id.text1, android.R.id.text2} );
+        SimpleAdapter adapter = new SimpleAdapter(this,
+                data,
+                android.R.layout.simple_list_item_2,
+                new String[]{"name", "price"},
+                new int[]{android.R.id.text1, android.R.id.text2});
 
         fruitsListView.setAdapter(adapter);
     }
 
     @Override
-    public void imageReceived(int requestId) {
+    public void imageReceived(Bitmap bitmap, int requestId) {
         // Not used
     }
 

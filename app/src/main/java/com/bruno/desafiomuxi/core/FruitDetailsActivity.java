@@ -1,5 +1,6 @@
 package com.bruno.desafiomuxi.core;
 
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,9 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 public class FruitDetailsActivity extends AppCompatActivity implements WebRequestListener {
+    // The default ID of requests for fruit image
+    private static final int FRUIT_IMAGE_REQUEST = 1;
+
     // Loading the native lib for currency conversion
     static {
         System.loadLibrary("currency-converter");
@@ -23,6 +27,11 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
 
     private ImageView fruitImageView;
     private TextView fruitNameTextView, usdPriceTextView, brlPriceTextView;
+
+    // The bitmap loaded from the fruit image URI is stored in order
+    // to save in the instance state in the case this activity is destroy
+    // so the bitmap can be restored without redownloading it from web
+    private Bitmap loadedBitmapFromWeb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +48,48 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
         usdPriceTextView = (TextView)findViewById(R.id.usdTextView);
         brlPriceTextView = (TextView)findViewById(R.id.brlTextView);
 
+        // Try to restore a saved state
+        if(!restoreState(savedInstanceState)) {
+            // If the state can't be restored, setup the activity
+            setupActivity();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putString("FRUIT_NAME", fruitNameTextView.getText().toString());
+        savedInstanceState.putString("USD_PRICE", usdPriceTextView.getText().toString());
+        savedInstanceState.putString("BRL_PRICE", brlPriceTextView.getText().toString());
+        savedInstanceState.putParcelable("FRUIT_BITMAP", loadedBitmapFromWeb);
+    }
+
+    private boolean restoreState(Bundle savedInstanceState) {
+        if(savedInstanceState != null) {
+            String  fruitName = savedInstanceState.getString("FRUIT_NAME"),
+                    usdPrice = savedInstanceState.getString("USD_PRICE"),
+                    brlPrice = savedInstanceState.getString("BRL_PRICE");
+            Bitmap fruitBitmap = savedInstanceState.getParcelable("FRUIT_BITMAP");
+
+            // If any of the key is not mapped, the state restoring failed
+            if(fruitName == null || usdPrice == null || brlPrice == null || fruitBitmap == null) {
+                return false; // Failed at restoring state
+            } else {
+                fruitNameTextView.setText(fruitName);
+                usdPriceTextView.setText(usdPrice);
+                brlPriceTextView.setText(brlPrice);
+
+                loadedBitmapFromWeb = fruitBitmap;
+
+                fruitImageView.setImageBitmap(fruitBitmap);
+
+                return true; // State succesfully restored
+            }
+        } else {
+            return false; // There is no instance state saved, nothing to be restored
+        }
+    }
+
+    private void setupActivity() {
         // Filling up view components with the extra information
         // passed from the main activity
         fruitNameTextView.setText(getIntent().getStringExtra("FRUIT_NAME"));
@@ -55,9 +106,9 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
         // Calls the asyncronous convertion from USD to BRL
         asyncConvertCurrency(getIntent().getDoubleExtra("FRUIT_PRICE", 0.0), usdToBrlConversionRatio);
 
-        // Fill up image view
+        // Fill up image view with image get through a web request
         String imageUrl = getIntent().getStringExtra("IMAGE_URL");
-        (new WebRequester()).imageGetRequest(imageUrl, this, 0, fruitImageView);
+        (new WebRequester()).imageGetRequest(imageUrl, this, FruitDetailsActivity.FRUIT_IMAGE_REQUEST, fruitImageView);
     }
 
     public native void asyncConvertCurrency(double baseValue, double conversionRatio);
@@ -74,12 +125,16 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
     }
 
     @Override
-    public void imageReceived(int requestId) {
-        Log.v("REQUEST", "Image " + getIntent().getStringExtra("IMAGE_URL") + " loaded");
+    public void imageReceived(Bitmap bitmap, int requestId) {
+        // Stores the bitmap load in order to save as tha instance state to reload
+        // later without making another web request for the image
+        loadedBitmapFromWeb = bitmap;
+
+        fruitImageView.setImageBitmap(bitmap);
     }
 
     @Override
     public void requestError(String errorMessage, int requestId) {
-        Log.e("REQUEST", errorMessage);
+        // Do nothing. WebRequester already log error messages
     }
 }
