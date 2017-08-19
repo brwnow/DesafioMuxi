@@ -12,6 +12,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bruno.desafiomuxi.R;
 import com.google.gson.Gson;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.LruCache;
@@ -37,7 +38,7 @@ public class WebRequester {
 
     // This method initializes the request queue, given a context
     // and sets the URL of the fruits json
-    public static void init(Context context, String fruitsJsonUrl) {
+    public static void init(Context context) {
         // Only initialize the request queue if no request queue were initialized before
         if(requestQueue == null || appContext == null) {
             requestQueue = Volley.newRequestQueue(context);
@@ -49,7 +50,9 @@ public class WebRequester {
             Log.v("WebRequest", "Request queue initialized");
         }
 
-        WebRequester.fruitsJsonUrl = fruitsJsonUrl;
+        // The fixed URI of the json file which contains information about
+        // the list of fruits
+        WebRequester.fruitsJsonUrl = context.getString(R.string.fruit_json_uri);
     }
 
     public WebRequester() {

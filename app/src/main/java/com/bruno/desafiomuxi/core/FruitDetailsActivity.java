@@ -31,7 +31,7 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
 
         // Initialize the web requester with the context of the application
         // and the JSON url
-        WebRequester.init(this.getApplicationContext(), "https://raw.githubusercontent.com/muxidev/desafio-android/master/fruits.json");
+        WebRequester.init(this.getApplicationContext());
 
         fruitImageView = (ImageView)findViewById(R.id.fruitImageView);
 
@@ -51,17 +51,22 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
 
         // Get the conversion ratio from USD to BRL
         double usdToBrlConversionRatio = currency.getConversionRatio(Currency.CurrencyTag.USD, Currency.CurrencyTag.BRL);
-        double brlPrice = convertCurrency(getIntent().getDoubleExtra("FRUIT_PRICE", 0.0), usdToBrlConversionRatio);
 
-        // Fill up real price text view with the converted and formatted price using
-        brlPriceTextView.setText(currency.format(brlPrice, Currency.CurrencyTag.BRL));
+        // Calls the asyncronous convertion from USD to BRL
+        asyncConvertCurrency(getIntent().getDoubleExtra("FRUIT_PRICE", 0.0), usdToBrlConversionRatio);
 
         // Fill up image view
         String imageUrl = getIntent().getStringExtra("IMAGE_URL");
         (new WebRequester()).imageGetRequest(imageUrl, this, 0, fruitImageView);
     }
 
-    public native double convertCurrency(double baseValue, double conversionRatio);
+    public native void asyncConvertCurrency(double baseValue, double conversionRatio);
+
+    public void conversionCallback(double valueConvertedToBrl) {
+        Currency currency = new Currency();
+
+        brlPriceTextView.setText(currency.format(valueConvertedToBrl, Currency.CurrencyTag.BRL));
+    }
 
     @Override
     public void fruitsReceived(Fruit[] fruits, int requestId) {

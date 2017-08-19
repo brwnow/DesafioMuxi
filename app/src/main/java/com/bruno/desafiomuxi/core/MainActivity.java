@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements WebRequestListene
 
         // Initialize the web requester with the context of the application
         // and the JSON url
-        WebRequester.init(this.getApplicationContext(), "https://raw.githubusercontent.com/muxidev/desafio-android/master/fruits.json");
+        WebRequester.init(this.getApplicationContext());
 
         fruitsListView = (ListView)findViewById(R.id.fruitsListView);
 

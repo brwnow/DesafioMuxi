@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Desafio Muxi</string>
+    <string name="fruit_json_uri">https://raw.githubusercontent.com/muxidev/desafio-android/master/fruits.json</string>
 </resources>

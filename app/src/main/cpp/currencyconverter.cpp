@@ -2,10 +2,24 @@
 // Created by Bruno on 18/08/2017.
 //
 
-#include <jni.h>
+#include<jni.h>
+#include "AsyncCurrencyConverter.h"
 
+#ifdef __cplusplus
 extern "C" {
-    JNIEXPORT jdouble JNICALL Java_com_bruno_desafiomuxi_core_FruitDetailsActivity_convertCurrency(JNIEnv *env, jobject, jdouble baseCurrency, jdouble conversionRatio) {
-        return baseCurrency * conversionRatio;
-    }
+#endif
+
+JNIEXPORT void JNICALL Java_com_bruno_desafiomuxi_core_FruitDetailsActivity_asyncConvertCurrency(
+        JNIEnv *env,
+        jobject obj,
+        jdouble baseCurrency,
+        jdouble conversionRatio)
+{
+    AsyncCurrencyConverter asyncCurrencyConverter(env, obj);
+
+    asyncCurrencyConverter.asyncConvertCurrency(baseCurrency, conversionRatio);
 }
+
+#ifdef __cplusplus
+}
+#endif
