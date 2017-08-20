@@ -14,6 +14,17 @@ public class Fruit {
         this.price = price;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if(other instanceof Fruit) {
+            Fruit otherFruit = (Fruit)other;
+
+            return  price == otherFruit.price && name.compareTo(otherFruit.name) == 0 && image.compareTo(otherFruit.image) == 0;
+        } else {
+            return false;
+        }
+    }
+
     public final String getName() {
         return name;
     }

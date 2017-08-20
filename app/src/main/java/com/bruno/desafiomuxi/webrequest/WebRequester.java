@@ -1,8 +1,7 @@
 package com.bruno.desafiomuxi.webrequest;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -10,7 +9,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bruno.desafiomuxi.R;
@@ -18,9 +16,6 @@ import com.google.gson.Gson;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
-import org.json.JSONObject;
 
 /**
  * Created by Bruno on 16/08/2017.
@@ -39,7 +34,8 @@ public class WebRequester {
 
     private static Picasso picasso;
 
-    private static String fruitsJsonUrl = "";
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    public static String fruitsJsonUrl = "";
 
     // This method initializes the request queue, given a context
     // and sets the URL of the fruits json
@@ -57,7 +53,7 @@ public class WebRequester {
 
         // The fixed URI of the json file which contains information about
         // the list of fruits
-        WebRequester.fruitsJsonUrl = context.getString(R.string.fruit_json_uri);
+        WebRequester.fruitsJsonUrl = appContext.getResources().getString(R.string.fruit_json_uri);
     }
 
     public WebRequester() {
