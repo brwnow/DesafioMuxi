@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements WebRequestListene
     }
 
     @Override
-    public void imageReceived(Bitmap bitmap, int requestId) {
+    public void imageReceived(int requestId) {
         // Not used
     }
 

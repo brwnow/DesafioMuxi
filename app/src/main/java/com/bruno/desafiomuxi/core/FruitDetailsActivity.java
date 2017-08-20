@@ -1,6 +1,7 @@
 package com.bruno.desafiomuxi.core;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -111,8 +112,13 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
         (new WebRequester()).imageGetRequest(imageUrl, this, FruitDetailsActivity.FRUIT_IMAGE_REQUEST, fruitImageView);
     }
 
+    // Calls the native lib for currency conversion
+    // baseValue: value to be converted
+    // conversionRatio: the ratio of the conversion
+    // Example: From U$1,00 to R$ with ratio 3,5 the result is R% 3,50
     public native void asyncConvertCurrency(double baseValue, double conversionRatio);
 
+    // Called by native currency conversion lib
     public void conversionCallback(double valueConvertedToBrl) {
         Currency currency = new Currency();
 
@@ -125,12 +131,13 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
     }
 
     @Override
-    public void imageReceived(Bitmap bitmap, int requestId) {
-        // Stores the bitmap load in order to save as tha instance state to reload
-        // later without making another web request for the image
-        loadedBitmapFromWeb = bitmap;
-
-        fruitImageView.setImageBitmap(bitmap);
+    public void imageReceived(int requestId) {
+        // Verify if this is the request of the fruit image
+        if(requestId == FRUIT_IMAGE_REQUEST) {
+            // Stores the bitmap of the fruit image to save as instance state
+            // In case the activity is destroy and try to restore state
+            loadedBitmapFromWeb = ((BitmapDrawable)fruitImageView.getDrawable()).getBitmap();
+        }
     }
 
     @Override

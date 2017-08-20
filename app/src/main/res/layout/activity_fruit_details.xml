@@ -16,8 +16,7 @@
         android:layout_weight="1"
         android:adjustViewBounds="true"
         android:cropToPadding="false"
-        android:scaleType="fitCenter"
-        app:srcCompat="@mipmap/ic_launcher" />
+        android:scaleType="fitCenter" />
 
     <TextView
         android:id="@+id/fruitNameTextView"
