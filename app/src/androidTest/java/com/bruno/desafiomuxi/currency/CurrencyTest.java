@@ -1,4 +1,4 @@
-package com.bruno.desafiomuxi.webrequest;
+package com.bruno.desafiomuxi.currency;
 
 import com.bruno.desafiomuxi.currency.Currency;
 

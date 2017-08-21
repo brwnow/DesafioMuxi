@@ -115,7 +115,7 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
     // Calls the native lib for currency conversion
     // baseValue: value to be converted
     // conversionRatio: the ratio of the conversion
-    // Example: From U$1,00 to R$ with ratio 3,5 the result is R% 3,50
+    // Example: From U$1,00 to R$ with ratio 3,5 the result is R$ 3,50
     public native void asyncConvertCurrency(double baseValue, double conversionRatio);
 
     // Called by native currency conversion lib
