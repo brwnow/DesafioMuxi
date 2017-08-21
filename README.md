@@ -24,9 +24,12 @@ Para a serialização do arquivo *.json* foi utilizada a biblioteca __Gson__.
 
 Para os testes foi utilizada a biblioteca __JUnit__, pois tem alta integração com o SDK do android, e para auxiliar na instrumentação de alguns testes foi utilizada a biblioteca __Espresso__
 
-O projeto foi organizado em 3 pacotes
+O projeto foi organizado em 4 pacotes
 * Core: É o pacote que contém as *Activities*
 * Currency: É o pacote que contém a classe responsável pelos câmbios entres moedas
 * WebRequest: É o pacote que contém o framework de comunicação com a API
+* Currency-converter: É a bibliteca com código nativo para conversão assíncrona entre valores monetários
 
 As Activities do projeto têm suporte à mudança de orientação das telas sem perder estado. Na __MainAcitivity__ como tem layout único, bastou adicionar no manifest *android:configChanges="orientation|screenSize"*. A __FruitDetailsActivity__ tem layout diferente para cada orientação, e portanto a persistência de estado foi implementada no próprio código.
+
+No módulo da biblioteca nativa para conversão assíncrona de moeda, foi utilizado um recurso disponível no C++ a partir da padronização C++11 para criar threads, pois como é um recurso embutido na linguagem, reduz problemas com dependências de bibliotecas externas.
