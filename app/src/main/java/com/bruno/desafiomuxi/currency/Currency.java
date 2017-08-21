@@ -45,7 +45,7 @@ public class Currency {
     // If the map of ratios does not contain this conversion, the method return
     // zero, because zero is an invalid ratio value
     public double getConversionRatio(CurrencyTag fromCurrency, CurrencyTag toCurrency) {
-        Pair<CurrencyTag, CurrencyTag> ratioKey = new Pair<>(CurrencyTag.USD, CurrencyTag.BRL);
+        Pair<CurrencyTag, CurrencyTag> ratioKey = new Pair<>(fromCurrency, toCurrency);
 
         if(ratioMap.containsKey(ratioKey)) {
             return ratioMap.get(ratioKey); // Conversion ratio found
