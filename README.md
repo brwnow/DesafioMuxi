@@ -29,4 +29,4 @@ O projeto foi organizado em 3 pacotes
 * Currency: É o pacote que contém a classe responsável pelos câmbios entres moedas
 * WebRequest: É o pacote que contém o framework de comunicação com a API
 
-As Activities do projeto têm suporte à mudança de orientação das telas sem perder estado. Na __MainAcitivity__ como tem layout único, bastou adicionar no manifest *android:configChanges="orientation|screenSize"*. A __FruitDetailsActivity__ tem layout diferente para cada orientação, e portanto a persistência de estado foi imlementada no próprio código.
+As Activities do projeto têm suporte à mudança de orientação das telas sem perder estado. Na __MainAcitivity__ como tem layout único, bastou adicionar no manifest *android:configChanges="orientation|screenSize"*. A __FruitDetailsActivity__ tem layout diferente para cada orientação, e portanto a persistência de estado foi implementada no próprio código.
