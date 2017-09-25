@@ -35,10 +35,6 @@ void AsyncCurrencyConverter::convertCurrencyCaller(AsyncCurrencyConverter *async
 AsyncCurrencyConverter::AsyncCurrencyConverter(JNIEnv *env, jobject obj) {
     // set up a reference to the JVM
     env->GetJavaVM(&jvm);
-
-    // Stores a reference to the JNI enviroment to be used in the destructor
-    this->env = env;
-
     // Global reference of the instance of FruitDetailsActivity that called the lib
     globalObjRef = env->NewGlobalRef(obj);
 }

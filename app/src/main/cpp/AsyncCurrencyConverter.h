@@ -27,7 +27,6 @@ public:
 
 private:
     JavaVM *jvm; // JVM reference
-    JNIEnv *env; // JNI enviroment reference
     jobject globalObjRef; // Global ref of the instance of FruitDetailsActivity
 };
 
