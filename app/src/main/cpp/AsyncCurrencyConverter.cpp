@@ -62,4 +62,8 @@ jobject AsyncCurrencyConverter::getGlobalObjectRef() {
     return globalObjRef;
 }
 
+void AsyncCurrencyConverter::setJVM(JavaVM *jvm) {
+    this->jvm = jvm;
+}
+
 

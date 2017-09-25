@@ -23,6 +23,8 @@ public:
     // Calls the converter method in another thread.
     void asyncConvertCurrency(jdouble baseValue, jdouble ratio);
 
+    void setJVM(JavaVM *jvm);
+
 private:
     JavaVM *jvm; // JVM reference
     JNIEnv *env; // JNI enviroment reference
