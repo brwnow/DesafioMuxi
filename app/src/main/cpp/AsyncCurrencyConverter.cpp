@@ -43,10 +43,6 @@ AsyncCurrencyConverter::AsyncCurrencyConverter(JNIEnv *env, jobject obj) {
     globalObjRef = env->NewGlobalRef(obj);
 }
 
-AsyncCurrencyConverter::~AsyncCurrencyConverter() {
-    // Free memory alocated by this global reference of the jobject
-    env->DeleteGlobalRef(globalObjRef);
-}
 
 void AsyncCurrencyConverter::asyncConvertCurrency(jdouble baseValue, jdouble ratio) {
     std::thread thread(AsyncCurrencyConverter::convertCurrencyCaller, this, baseValue, ratio);
