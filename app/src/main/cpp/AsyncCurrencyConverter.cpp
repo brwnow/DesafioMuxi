@@ -25,33 +25,28 @@ void AsyncCurrencyConverter::convertCurrencyCaller(AsyncCurrencyConverter *async
         // Pass the result of the conversion to the callback method
         env->CallVoidMethod(asyncCurConverter->getGlobalObjectRef(), callbackMethodId, conversionResult);
 
+
+        // Free memory alocated by this global reference of the jobject
+        env->DeleteGlobalRef(asyncCurConverter->getGlobalObjectRef());
+
         // Detach the current thread from JVM
         asyncCurConverter->getJavaVM()->DetachCurrentThread();
     } else {
         __android_log_write(ANDROID_LOG_ERROR, "ASYNC_CONVERTER", "Failed to attach a thread to the JVM");
     }
+        delete asyncCurConverter;
 }
 
 AsyncCurrencyConverter::AsyncCurrencyConverter(JNIEnv *env, jobject obj) {
-    // set up a reference to the JVM
-    env->GetJavaVM(&jvm);
-
-    // Stores a reference to the JNI enviroment to be used in the destructor
-    this->env = env;
-
     // Global reference of the instance of FruitDetailsActivity that called the lib
     globalObjRef = env->NewGlobalRef(obj);
 }
 
-AsyncCurrencyConverter::~AsyncCurrencyConverter() {
-    // Free memory alocated by this global reference of the jobject
-    env->DeleteGlobalRef(globalObjRef);
-}
 
 void AsyncCurrencyConverter::asyncConvertCurrency(jdouble baseValue, jdouble ratio) {
     std::thread thread(AsyncCurrencyConverter::convertCurrencyCaller, this, baseValue, ratio);
 
-    thread.join();
+    thread.detach();
 }
 
 JavaVM *AsyncCurrencyConverter::getJavaVM() {
@@ -60,6 +55,10 @@ JavaVM *AsyncCurrencyConverter::getJavaVM() {
 
 jobject AsyncCurrencyConverter::getGlobalObjectRef() {
     return globalObjRef;
+}
+
+void AsyncCurrencyConverter::setJVM(JavaVM *jvm) {
+    this->jvm = jvm;
 }
 
 

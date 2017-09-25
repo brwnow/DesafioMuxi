@@ -119,10 +119,16 @@ public class FruitDetailsActivity extends AppCompatActivity implements WebReques
     public native void asyncConvertCurrency(double baseValue, double conversionRatio);
 
     // Called by native currency conversion lib
-    public void conversionCallback(double valueConvertedToBrl) {
-        Currency currency = new Currency();
+    public void conversionCallback(final double valueConvertedToBrl) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Currency currency = new Currency();
 
-        brlPriceTextView.setText(currency.format(valueConvertedToBrl, Currency.CurrencyTag.BRL));
+                brlPriceTextView.setText(currency.format(valueConvertedToBrl, Currency.CurrencyTag.BRL));
+
+            }
+        });
     }
 
     @Override

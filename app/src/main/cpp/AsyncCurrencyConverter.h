@@ -16,7 +16,6 @@ public:
     static void convertCurrencyCaller(AsyncCurrencyConverter *asyncCurConverter, jdouble baseValue, jdouble ratio);
 
     AsyncCurrencyConverter(JNIEnv *env, jobject obj);
-    ~AsyncCurrencyConverter();
 
     JavaVM* getJavaVM();
     jobject getGlobalObjectRef();
@@ -24,9 +23,10 @@ public:
     // Calls the converter method in another thread.
     void asyncConvertCurrency(jdouble baseValue, jdouble ratio);
 
+    void setJVM(JavaVM *jvm);
+
 private:
     JavaVM *jvm; // JVM reference
-    JNIEnv *env; // JNI enviroment reference
     jobject globalObjRef; // Global ref of the instance of FruitDetailsActivity
 };
 
