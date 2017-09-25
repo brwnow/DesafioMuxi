@@ -25,11 +25,16 @@ void AsyncCurrencyConverter::convertCurrencyCaller(AsyncCurrencyConverter *async
         // Pass the result of the conversion to the callback method
         env->CallVoidMethod(asyncCurConverter->getGlobalObjectRef(), callbackMethodId, conversionResult);
 
+
+        // Free memory alocated by this global reference of the jobject
+        env->DeleteGlobalRef(asyncCurConverter->getGlobalObjectRef());
+
         // Detach the current thread from JVM
         asyncCurConverter->getJavaVM()->DetachCurrentThread();
     } else {
         __android_log_write(ANDROID_LOG_ERROR, "ASYNC_CONVERTER", "Failed to attach a thread to the JVM");
     }
+        delete asyncCurConverter;
 }
 
 AsyncCurrencyConverter::AsyncCurrencyConverter(JNIEnv *env, jobject obj) {
