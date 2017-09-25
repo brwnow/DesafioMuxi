@@ -33,8 +33,6 @@ void AsyncCurrencyConverter::convertCurrencyCaller(AsyncCurrencyConverter *async
 }
 
 AsyncCurrencyConverter::AsyncCurrencyConverter(JNIEnv *env, jobject obj) {
-    // set up a reference to the JVM
-    env->GetJavaVM(&jvm);
     // Global reference of the instance of FruitDetailsActivity that called the lib
     globalObjRef = env->NewGlobalRef(obj);
 }
