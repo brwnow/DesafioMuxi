@@ -51,7 +51,7 @@ AsyncCurrencyConverter::~AsyncCurrencyConverter() {
 void AsyncCurrencyConverter::asyncConvertCurrency(jdouble baseValue, jdouble ratio) {
     std::thread thread(AsyncCurrencyConverter::convertCurrencyCaller, this, baseValue, ratio);
 
-    thread.join();
+    thread.detach();
 }
 
 JavaVM *AsyncCurrencyConverter::getJavaVM() {
