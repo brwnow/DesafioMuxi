@@ -16,7 +16,6 @@ public:
     static void convertCurrencyCaller(AsyncCurrencyConverter *asyncCurConverter, jdouble baseValue, jdouble ratio);
 
     AsyncCurrencyConverter(JNIEnv *env, jobject obj);
-    ~AsyncCurrencyConverter();
 
     JavaVM* getJavaVM();
     jobject getGlobalObjectRef();
